@@ -79,19 +79,29 @@ pipeline {
 
         stage('Deployment') {
             steps {
-                script {
-                    env.RESULTADO = sh(
-                        script: '''
-                            bash scripts/deploy.sh \
-                                "$NOVA_VERSAO" \
-                                "$VERSAO_ESTAVEL"
-                        ''',
-                        returnStatus: true
-                    ).toString()
+                withCredentials([
+                    file(
+                        credentialsId: 'app-env-prod',
+                        variable: 'ENV_FILE'
+                    )
+                ]) {
+                    script {
+                        env.RESULTADO = sh(
+                            script: '''
+                                mkdir -p config
+        
+                                cp "$ENV_FILE" config/.env.prod
+        
+                                bash scripts/deploy.sh \
+                                    "$NOVA_VERSAO" \
+                                    "$VERSAO_ESTAVEL"
+                            ''',
+                            returnStatus: true
+                        ).toString()
+                    }
                 }
             }
         }
-
         stage('Validar resultado') {
             steps {
                 script {
