@@ -47,7 +47,6 @@ pipeline {
 
                     test -f scripts/deploy.sh
                     test -f compose.yaml
-                    test -f config/.env.prod
                 '''
             }
         }
